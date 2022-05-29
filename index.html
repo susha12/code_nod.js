@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+            flex-direction: column;
+        }
+        h1{
+            margin: 20px auto;
+            color: white;
+        }
+        div{
+            max-width: 500px;
+            height: auto;
+            /* border: 2px solid red; */
+            background-color: white;
+            padding: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>код написанный в node js</h1>
+    <div class="div">
+const express = require('express');<br>
+const app = express();<br>
+var fs = require('fs');<br>
+const format = require("node.date-time");<br>
+const bodyParser = require("body-parser");<br>
+const port = process.env.port || 8080;<br>
+<br>
+//Функция для вывода времени<br>
+function LogTime(){<br>
+return new Date().format("Y-MM-dd HH:mm:SS")+" ";<br>
+}<br>
+<br>
+app.get('/', function (req, res, next) { /*отправка пользователю формы и фиксация в журнале*/<br>
+fs.appendFile('req.log', LogTime()+'Загрузка страницы без постфикса.'+'\n', 'utf8', function(){});<br>
+next();<br>
+},<br>
+//отправка пользователю формы<br>
+function (req, res) {<br>
+res.sendFile(__dirname + "/static" + "/form.html");<br>
+});<br>
+<br>
+//создание парсера для данных<br>
+const urlencodedParser = bodyParser.urlencoded({<br>
+extended: false,<br>
+});<br>
+<br>
+//определение функции для обработки<br>
+app.post('/register', urlencodedParser, function (req,res) {<br>
+if (!req.body) return res.sendStatus(400);<br>
+<br>
+//читаем файл-лог и переводим в строку<br>
+var data = fs.readFileSync("req.log");<br>
+<br>
+data.toString();<br>
+<br>
+//вывод введённых данных и файла-лога<br>
+res.send("<h2>Это данные</h2><p>Фамилия: "+`${req.body.sname}` + "<br>Имя: "+`${req.body.name}` + `<br>Отчество: ${req.body.secname}`);<br>
+<br>
+//запись полученных данных в журнал<br>
+fs.appendFile('req.log',LogTime()<br>
++ 'Получены следующие данные' + '\n'<br>
++ 'Фамилия: ' + `${req.body.sname}` + '\n'<br>
++ 'Имя: ' + `${req.body.name}` + '\n'<br>
++ 'Отчество: ' + `${req.body.secname}` + '\n', 'utf8', function(){});<br>
+});<br>
+<br>
+app.use(express.static((__dirname + '/static')));<br>
+app.listen(port);<br>
+    </div>
+
+
+</body>
+</html>
